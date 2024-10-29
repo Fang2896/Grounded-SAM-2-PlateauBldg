@@ -9,25 +9,18 @@ from pathlib import Path
 from torchvision.ops import box_convert
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
-from grounding_dino.groundingdino.util.inference import load_model, load_image, predict
+from groundingdino.util.inference import load_model, load_image, predict
 
 """
 Hyper parameters
 """
-TEXT_PROMPT = "car. tire."
-IMG_PATH = "notebooks/images/truck.jpg"
 SAM2_CHECKPOINT = "./checkpoints/sam2_hiera_large.pt"
 SAM2_MODEL_CONFIG = "sam2_hiera_l.yaml"
 GROUNDING_DINO_CONFIG = "grounding_dino/groundingdino/config/GroundingDINO_SwinT_OGC.py"
 GROUNDING_DINO_CHECKPOINT = "gdino_checkpoints/groundingdino_swint_ogc.pth"
-BOX_THRESHOLD = 0.35
-TEXT_THRESHOLD = 0.25
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-OUTPUT_DIR = Path("outputs/grounded_sam2_local_demo")
-DUMP_JSON_RESULTS = True
 
-# create output directory
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 # environment settings
 # use bfloat16
@@ -44,6 +37,21 @@ grounding_model = load_model(
     model_checkpoint_path=GROUNDING_DINO_CHECKPOINT,
     device=DEVICE
 )
+
+# ================================= I/O Setting ================================= #
+DUMP_JSON_RESULTS = True
+
+TEXT_PROMPT = "Area without shadowing and noise"
+IMG_PATH = "plateau/textures/poly_TK040555_p9664_3_tex.jpg"
+
+image_name = os.path.splitext(os.path.basename(IMG_PATH))[0]
+
+OUTPUT_DIR = Path(f"plateau/outputs/{image_name}")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+BOX_THRESHOLD = 0.35
+TEXT_THRESHOLD = 0.25
+# ================================= I/O Setting ================================= #
 
 
 # setup the input image and text prompt for SAM 2 and Grounding DINO
